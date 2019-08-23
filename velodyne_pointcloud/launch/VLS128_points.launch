@@ -1,12 +1,11 @@
 <!-- -*- mode: XML -*- -->
 <!-- Copyright (C) 2018, Velodyne LiDAR INC., Algorithms and Signal Processing Group -->
 <!-- Author : Velodyne LiDAR, Algorithms and Signal Processing Group -->
-<!-- run velodyne_pointcloud/CloudNodelet in a nodelet manager for a VLS-128 -->
+<!-- run velodyne_pointcloud/TransformNodelet in a nodelet manager for a VLS-128 -->
 
 <launch>
 
   <!-- declare arguments with default values -->
-  <arg name="rviz" default="false" />
   <arg name="calibration" default="$(find velodyne_pointcloud)/params/VeloView_VLS-128_FS1.yaml"/>
   <arg name="device_ip" default="" />
   <arg name="frame_id" default="velodyne" />
@@ -19,6 +18,10 @@
   <arg name="read_once" default="false" />
   <arg name="repeat_delay" default="0.0" />
   <arg name="rpm" default="600.0" />
+  <arg name="gps_time" default="false" />
+  <arg name="cut_angle" default="-0.01" />
+  <arg name="organize_cloud" default="false" />
+  <arg name="auto_rpm_alpha" default="0.5" />
 
   <!-- start nodelet manager and driver nodelets -->
   <include file="$(find velodyne_driver)/launch/nodelet_manager.launch">
@@ -32,14 +35,18 @@
     <arg name="read_once" value="$(arg read_once)"/>
     <arg name="repeat_delay" value="$(arg repeat_delay)"/>
     <arg name="rpm" value="$(arg rpm)"/>
+    <arg name="gps_time" value="$(arg gps_time)"/>
+    <arg name="cut_angle" value="$(arg cut_angle)"/>
+    <arg name="auto_rpm_alpha" value="$(arg auto_rpm_alpha)"/>
   </include>
 
-  <!-- start cloud nodelet -->
-  <include file="$(find velodyne_pointcloud)/launch/cloud_nodelet.launch">
+  <!-- start transform nodelet -->
+  <include file="$(find velodyne_pointcloud)/launch/transform_nodelet.launch">
     <arg name="calibration" value="$(arg calibration)"/>
     <arg name="manager" value="$(arg manager)" />
     <arg name="max_range" value="$(arg max_range)"/>
     <arg name="min_range" value="$(arg min_range)"/>
+    <arg name="organize_cloud" value="$(arg organize_cloud)"/>
   </include>
 
 </launch>
