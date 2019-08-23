@@ -77,6 +77,16 @@ static const float VLP16_BLOCK_TDURATION = 110.592f;  // [µs]
 static const float VLP16_DSR_TOFFSET = 2.304f;        // [µs]
 static const float VLP16_FIRING_TOFFSET = 55.296f;    // [µs]
 
+/** Special Defines for VLS128 support **/
+// These are used to detect which bank of 32 lasers is in this block
+static const uint16_t VLS128_BANK_1 = 0xeeff;
+static const uint16_t VLS128_BANK_2 = 0xddff;
+static const uint16_t VLS128_BANK_3 = 0xccff;
+static const uint16_t VLS128_BANK_4 = 0xbbff;
+
+static const float  VLS128_CHANNEL_TDURATION  =  2.665f;  // [µs] Channels corresponds to one laser firing
+static const float  VLS128_SEQ_TDURATION      =  53.3f;   // [µs] Sequence is a set of laser firings including recharging
+
 /** \brief Raw Velodyne data block.
  *
  *  Each block contains data from either the upper or lower laser
@@ -191,8 +201,17 @@ private:
   float sin_rot_table_[ROTATION_MAX_UNITS];
   float cos_rot_table_[ROTATION_MAX_UNITS];
 
+  // Caches the azimuth percent offset for the VLS-128 laser firings
+  float vls_128_laser_azimuth_cache[16];
+
   /** add private function to handle the VLP16 **/
   void unpack_vlp16(const velodyne_msgs::VelodynePacket& pkt, DataContainerBase& data);
+  // void unpack_vlp32(const velodyne_msgs::VelodynePacket &pkt, DataContainerBase& data);
+  // void unpack_hdl32(const velodyne_msgs::VelodynePacket &pkt, DataContainerBase& data);
+  void unpack_hdl64(const velodyne_msgs::VelodynePacket &pkt, DataContainerBase& data);
+  void unpack_vls128(const velodyne_msgs::VelodynePacket &pkt, DataContainerBase& data);
+  void compute_xyzi(const uint8_t chan_id, const uint16_t azimuth_uint, const float distance, float &intensity,
+      float &x_coord, float &y_coord, float &z_coord);
 };
 
 }  // namespace velodyne_rawdata

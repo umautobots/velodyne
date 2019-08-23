@@ -9,12 +9,14 @@
   <arg name="model" default="64E" />
   <arg name="pcap" default="" />
   <arg name="port" default="2368" />
+  <arg name="npackets" default="" />
   <arg name="read_fast" default="false" />
   <arg name="read_once" default="false" />
   <arg name="repeat_delay" default="0.0" />
   <arg name="rpm" default="600.0" />
   <arg name="gps_time" default="false" />
   <arg name="cut_angle" default="-0.01" />
+  <arg name="auto_rpm_alpha" default="0.999" />
 
   <!-- start nodelet manager -->
   <node pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" output="screen"/>
@@ -27,12 +29,14 @@
     <param name="model" value="$(arg model)"/>
     <param name="pcap" value="$(arg pcap)"/>
     <param name="port" value="$(arg port)" />
+    <param name="npackets" value="$(arg npackets)" />
     <param name="read_fast" value="$(arg read_fast)"/>
     <param name="read_once" value="$(arg read_once)"/>
     <param name="repeat_delay" value="$(arg repeat_delay)"/>
     <param name="rpm" value="$(arg rpm)"/>
     <param name="gps_time" value="$(arg gps_time)"/>
     <param name="cut_angle" value="$(arg cut_angle)"/>
+    <param name="auto_rpm_alpha" value="$(arg auto_rpm_alpha)"/>
   </node>    
 
 </launch>
