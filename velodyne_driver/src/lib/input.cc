@@ -44,15 +44,17 @@
  *              PCAP dump
  */
 
-#include <unistd.h>
-#include <string>
-#include <sstream>
-#include <sys/socket.h>
 #include <arpa/inet.h>
-#include <poll.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <pcap.h>
+#include <poll.h>
+#include <string>
+#include <sstream>
 #include <sys/file.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
 #include <velodyne_driver/input.h>
 #include <velodyne_driver/time_conversion.hpp>
 
@@ -262,6 +264,7 @@ namespace velodyne_driver
     private_nh.param("read_once", read_once_, false);
     private_nh.param("read_fast", read_fast_, false);
     private_nh.param("repeat_delay", repeat_delay_, 0.0);
+    private_nh.param("pcap_time", pcap_time_, false);
 
     if (read_once_)
       ROS_INFO("Read input file only once.");
@@ -317,7 +320,17 @@ namespace velodyne_driver
               packet_rate_.sleep();
             
             memcpy(&pkt->data[0], pkt_data+42, packet_size);
-            pkt->stamp = ros::Time::now(); // time_offset not considered here, as no synchronization required
+            if (!gps_time_) {
+              if (!pcap_time_) {
+                pkt->stamp = ros::Time::now(); // time_offset not considered here, as no synchronization required
+              } else {
+                pkt->stamp = ros::Time(header->ts.tv_sec, header->ts.tv_usec * 1000); // 
+              }
+            } else {
+              // time for each packet is a 4 byte uint located starting at offset 1200 in
+              // the data packet
+              pkt->stamp = rosTimeFromGpsTimestamp(&(pkt->data[1200]), header);
+            }
             empty_ = false;
             return 0;                   // success
           }
